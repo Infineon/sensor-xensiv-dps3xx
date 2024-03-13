@@ -678,8 +678,8 @@ cy_rslt_t xensiv_dps3xx_set_config(xensiv_dps3xx_t* dev, xensiv_dps3xx_config_t*
                                                    config->temperature_rate);
     }
     if ((CY_RSLT_SUCCESS == rc) &&
-        ((config->pressure_rate != dev->user_config.temperature_rate) ||
-         (config->pressure_oversample != dev->user_config.temperature_oversample)))
+        ((config->pressure_rate != dev->user_config.pressure_rate) ||
+         (config->pressure_oversample != dev->user_config.pressure_oversample)))
     {
         rc = _xensiv_dps3xx_set_pressure_config(dev, config->pressure_oversample,
                                                 config->pressure_rate);
