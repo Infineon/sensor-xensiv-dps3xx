@@ -1,10 +1,12 @@
 /***********************************************************************************************//**
  * \file xensiv_dps3xx.h
  *
- * Description: This file is the public interface of the XENSIV DPS3xx pressure sensors.
+ * Description: This file is the public interface of the XENSIV™  DPS3xx pressure sensors.
  ***************************************************************************************************
  * \copyright
- * Copyright 2021 Cypress Semiconductor Corporation
+ * Copyright 2021-2022 Cypress Semiconductor Corporation (an Infineon company) or
+ * an affiliate of Cypress Semiconductor Corporation
+ *
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +27,7 @@
 /**
  * \addtogroup group_board_libs Pressure Sensor
  * \{
- * Basic set of APIs for interacting with the XENSIV DPS3xx pressure sensors. This provides basic
+ * Basic set of APIs for interacting with the XENSIV™  DPS3xx pressure sensors. This provides basic
  * initialization and access to to the pressure & temperature data. It also provides access to the
  * configuration settings for the sensor for full control. More information about the motion sensor
  * is available at:
@@ -222,7 +224,7 @@ typedef struct
 /** Initialize the DPS sensor, and configures it to use the specified I2C peripheral.
  * By default it is configured in command mode.
  *
- * \note A ModusToolbox HAL based equivalent, xensiv_dps3xx_mtb_init_i2c(), is also available
+ * \note A ModusToolbox™ HAL based equivalent, xensiv_dps3xx_mtb_init_i2c(), is also available
  *
  * @param[out]  obj         Pointer to an pressure sensor object. The caller must allocate the
  * memory for this object but the init function will initialize its contents.

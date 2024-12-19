@@ -1,10 +1,12 @@
 /***********************************************************************************************//**
  * \file xensiv_dps3xx_mtb.c
  *
- * Description: This file contains ModusToolbox specific functions for the DPS3xx pressure sensors.
+ * Description: This file contains ModusToolbox™ specific functions for the DPS3xx pressure sensors.
  ***************************************************************************************************
  * \copyright
- * Copyright 2021 Cypress Semiconductor Corporation
+ * Copyright 2021-2022 Cypress Semiconductor Corporation (an Infineon company) or
+ * an affiliate of Cypress Semiconductor Corporation
+ *
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +26,8 @@
 
 #include "xensiv_dps3xx_mtb.h"
 #include "cyhal_system.h"
+
+#include <string.h> // For memcpy
 
 
 //--------------------------------------------------------------------------------------------------
@@ -68,7 +72,7 @@ static cy_rslt_t _xensiv_dps3xx_mtb_reg_write(void* context, uint16_t timeout, u
 //--------------------------------------------------------------------------------------------------
 // xensiv_dps3xx_mtb_init_i2c
 //--------------------------------------------------------------------------------------------------
-cy_rslt_t xensiv_dps3xx_mtb_init_i2c(xensiv_dps3xx_t* dev, cyhal_i2c_t* i2c_dev,
+cy_rslt_t xensiv_dps3xx_mtb_init_i2c(xensiv_dps3xx_t* obj, cyhal_i2c_t* i2c,
                                      xensiv_dps3xx_i2c_addr_t i2c_addr)
 {
     xensiv_dps3xx_i2c_comm_t functions =
@@ -76,9 +80,9 @@ cy_rslt_t xensiv_dps3xx_mtb_init_i2c(xensiv_dps3xx_t* dev, cyhal_i2c_t* i2c_dev,
         .read    = _xensiv_dps3xx_mtb_reg_read,
         .write   = _xensiv_dps3xx_mtb_reg_write,
         .delay   = cyhal_system_delay_ms,
-        .context = i2c_dev
+        .context = i2c
     };
-    return xensiv_dps3xx_init_i2c(dev, &functions, i2c_addr);
+    return xensiv_dps3xx_init_i2c(obj, &functions, i2c_addr);
 }
 
 

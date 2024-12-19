@@ -1,8 +1,8 @@
-# XENSIV DPS-310/368 Pressure Sensor
+# XENSIV™  DPS-310/368 Pressure Sensor
 
 ### Overview
 
-This library provides functions for interfacing with the XENSIV DPS-310/368 Barometric Pressure Sensors. These are miniaturized digital barometric air pressure sensors with ultra-high precision (±2 cm) and a low current consumption, capable of measuring both pressure and temperature. The pressure sensor element is based on a capacitive sensing principle which guarantees high precision during temperature changes. This library can be setup to use the ModusToolbox HAL interface, or using user provided communication functions.
+This library provides functions for interfacing with the XENSIV™  DPS-310/368 Barometric Pressure Sensors. These are miniaturized digital barometric air pressure sensors with ultra-high precision (±2 cm) and a low current consumption, capable of measuring both pressure and temperature. The pressure sensor element is based on a capacitive sensing principle which guarantees high precision during temperature changes. This library can be setup to use the ModusToolbox™ HAL interface, or using user provided communication functions.
 
 Sensor Website: https://www.infineon.com/cms/en/product/sensor/pressure-sensors/pressure-sensors-for-iot/
 
@@ -52,7 +52,7 @@ int main(void)
     CY_ASSERT(result == CY_RSLT_SUCCESS);
 
     /* Initialize pressure sensor */
-    result = xensiv_dps3xx_mtb_init_i2c(&pressure_sensor, &i2c, MTB_DPS3XX_I2C_ADDR_DEFAULT);
+    result = xensiv_dps3xx_mtb_init_i2c(&pressure_sensor, &i2c, XENSIV_DPS3XX_I2C_ADDR_DEFAULT);
     CY_ASSERT(result == CY_RSLT_SUCCESS);
 
     for (;;)
@@ -72,10 +72,10 @@ int main(void)
 
 ### More information
 
-* [API Reference Guide](https://cypresssemiconductorco.github.io/sensor-xensiv-dps3xx/html/index.html)
+* [API Reference Guide](https://infineon.github.io/sensor-xensiv-dps3xx/html/index.html)
 * [Infineon Technologies](https://www.infineon.com)
-* [Cypress Semiconductor GitHub](https://github.com/cypresssemiconductorco)
-* [ModusToolbox](https://www.cypress.com/products/modustoolbox-software-environment)
+* [Infineon GitHub](https://github.com/infineon)
+* [ModusToolbox™](https://www.cypress.com/products/modustoolbox-software-environment)
 
 ---
 © Infineon Technologies, 2021.

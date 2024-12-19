@@ -1,11 +1,13 @@
 /***********************************************************************************************//**
  * \file xensiv_dps3xx_mtb.h
  *
- * Description: This file contains ModusToolbox specific public interface for the XENSIV DPS3xx
+ * Description: This file contains ModusToolbox™ specific public interface for the XENSIV™  DPS3xx
  * pressure sensors.
  ***************************************************************************************************
  * \copyright
- * Copyright 2021 Cypress Semiconductor Corporation
+ * Copyright 2021-2022 Cypress Semiconductor Corporation (an Infineon company) or
+ * an affiliate of Cypress Semiconductor Corporation
+ *
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
