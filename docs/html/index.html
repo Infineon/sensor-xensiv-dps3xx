@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>XENSIV DPS3xx Pressure Sensor (sensor-xensiv-dps3xx)</title>
+<title>Driver library to interface with XENSIV&trade; DPS-310/368 Barometric Pressure Sensors in ModusToolbox&trade;</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="logo.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">XENSIV DPS3xx Pressure Sensor (sensor-xensiv-dps3xx)</div>
+   <div id="projectname">Driver library to interface with XENSIV&trade; DPS-310/368 Barometric Pressure Sensors in ModusToolbox&trade;</div>
   </td>
  </tr>
  </tbody>
@@ -83,89 +83,108 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">XENSIV™ DPS-310/368 Pressure Sensor </div></div>
+  <div class="headertitle"><div class="title">XENSIV&trade; DPS-310/368 pressure sensor </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p ><a class="anchor" id="md_source_peripherals_sensor_xensiv_dps3xx_README_doxygen"></a> </p>
+<div class="textblock"><p ><a class="anchor" id="md_README_doxygen"></a> </p>
 <h2><a class="anchor" id="autotoc_md1"></a>
 Overview</h2>
-<p >This library provides functions for interfacing with the XENSIV™ DPS-310/368 Barometric Pressure Sensors. These are miniaturized digital barometric air pressure sensors with ultra-high precision (±2 cm) and a low current consumption, capable of measuring both pressure and temperature. The pressure sensor element is based on a capacitive sensing principle which guarantees high precision during temperature changes. This library can be setup to use the ModusToolbox™ HAL interface, or using user provided communication functions.</p>
-<p >Sensor Website: <a href="https://www.infineon.com/cms/en/product/sensor/pressure-sensors/pressure-sensors-for-iot/">https://www.infineon.com/cms/en/product/sensor/pressure-sensors/pressure-sensors-for-iot/</a></p>
-<h2><a class="anchor" id="autotoc_md2"></a>
-Quick Start</h2>
-<p >Follow the steps below to create a simple application which outputs the pressure and temperature data from the sensor to the UART</p><ol type="1">
-<li>Create an empty application</li>
-<li>Add this library to the application</li>
-<li>Add retarget-io library using the Library Manager</li>
-<li>Place following code in the main.c file.</li>
-<li>Define I2C SDA and SCL as appropriate for your hardware/shield kit <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;cyhal.h&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;cybsp.h&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;cy_retarget_io.h&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;xensiv_dps3xx_mtb.h&quot;</span></div>
+<p >This library provides functions for interfacing with the XENSIV&trade; DPS-310/368 barometric pressure sensors. These are miniaturized digital barometric air pressure sensors with ultra-high precision (±2 cm) and a low current consumption, which can measure both pressure and temperature. The pressure sensor element is based on a capacitive sensing principle, which guarantees high precision during temperature changes. This library can be setup to use the ModusToolbox&trade; HAL interface used on the <a href="https://www.infineon.com/KIT_PSE84_AI">PSOC&trade; Edge E84 AI Kit</a>, or using user-provided communication functions.</p>
+<p ><a href="https://www.infineon.com/products/sensor/pressure-sensors/pressure-sensors-for-iot">Pressure sensors for IoT</a></p>
+<h1><a class="anchor" id="autotoc_md2"></a>
+Quick start</h1>
+<p >Follow these steps to create a simple application, which outputs the magnetometer data from the sensor to the UART.</p>
+<ol type="1">
+<li>Create a new application in the ModusToolbox&trade; and select the appropriate board support package (BSP)</li>
+<li>Select the <a href="https://github.com/Infineon/mtb-example-psoc-edge-hello-world">PSOC&trade; Edge MCU: Hello world</a> application and create it</li>
+<li>Add the sensor-xensiv-dps3xx library to the application</li>
+<li><p class="startli">Place the following code in the <em>main.c</em> file of the non-secure application of your project (<em>proj_cm33_ns</em>)</p>
+<div class="fragment"><div class="line">#include &quot;cybsp.h&quot;</div>
+<div class="line">#include &quot;mtb_hal.h&quot;</div>
+<div class="line">#include &quot;retarget_io_init.h&quot;</div>
+<div class="line">#include &quot;mtb_xensiv_dps3xx.h&quot;</div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_struct" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> pressure_sensor;</div>
-<div class="line">cyhal_i2c_t i2c;</div>
-<div class="line">cyhal_i2c_cfg_t i2c_cfg = {</div>
-<div class="line">    .is_slave = <span class="keyword">false</span>,</div>
-<div class="line">    .address = 0,</div>
-<div class="line">    .frequencyhal_hz = 400000</div>
-<div class="line">};</div>
+<div class="line">cy_stc_scb_i2c_context_t i2c_controller_context;</div>
+<div class="line">mtb_hal_i2c_t CYBSP_I2C_CONTROLLER_hal_obj;</div>
 <div class="line"> </div>
-<div class="line"><span class="preprocessor">#define DPS_I2C_SDA (?) </span><span class="comment">// Define me</span></div>
-<div class="line"><span class="preprocessor">#define DPS_I2C_SCL (?) </span><span class="comment">// Define me</span></div>
+<div class="line">xensiv_dps3xx_t pressure_sensor;</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">void</span>)</div>
+<div class="line">int main(void)</div>
 <div class="line">{</div>
 <div class="line">    cy_rslt_t result;</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">/* Initialize the device and board peripherals */</span></div>
+<div class="line">    /* Initializes the device and board peripherals. */</div>
 <div class="line">    result = cybsp_init();</div>
-<div class="line">    CY_ASSERT(result == CY_RSLT_SUCCESS);</div>
 <div class="line"> </div>
+<div class="line">    /* Board initialization failed. Stops program execution. */</div>
+<div class="line">    if (CY_RSLT_SUCCESS != result)</div>
+<div class="line">    {</div>
+<div class="line">        CY_ASSERT(0);</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    /* Enables global interrupts. */</div>
 <div class="line">    __enable_irq();</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">/* Initialize retarget-io to use the debug UART port */</span></div>
-<div class="line">    result = cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);</div>
-<div class="line">    CY_ASSERT(result == CY_RSLT_SUCCESS);</div>
+<div class="line">    /* Initializes retarget-io middleware. */</div>
+<div class="line">    init_retarget_io();</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">/* Initialize i2c for pressure sensor */</span></div>
-<div class="line">    result = cyhal_i2c_init(&amp;i2c, DPS_I2C_SDA, DPS_I2C_SCL, NULL);</div>
-<div class="line">    CY_ASSERT(result == CY_RSLT_SUCCESS);</div>
-<div class="line">    result = cyhal_i2c_configure(&amp;i2c, &amp;i2c_cfg);</div>
-<div class="line">    CY_ASSERT(result == CY_RSLT_SUCCESS);</div>
+<div class="line">    /* Initializes I2C. */</div>
+<div class="line">    result = Cy_SCB_I2C_Init(CYBSP_I2C_CONTROLLER_HW,</div>
+<div class="line">                             &amp;CYBSP_I2C_CONTROLLER_config,</div>
+<div class="line">                             &amp;i2c_controller_context);</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">/* Initialize pressure sensor */</span></div>
-<div class="line">    result = xensiv_dps3xx_mtb_init_i2c(&amp;pressure_sensor, &amp;i2c, <a class="code hl_enumvalue" href="group__group__board__libs.html#gga788a5c414e6bf81811f38bd5d776774ca83077c0196f24e69990a6cbb91de4d58">XENSIV_DPS3XX_I2C_ADDR_DEFAULT</a>);</div>
-<div class="line">    CY_ASSERT(result == CY_RSLT_SUCCESS);</div>
-<div class="line"> </div>
-<div class="line">    <span class="keywordflow">for</span> (;;)</div>
+<div class="line">    if (CY_RSLT_SUCCESS != result)</div>
 <div class="line">    {</div>
-<div class="line">        <span class="comment">/* Get the pressure and temperature data and print the results to the UART */</span></div>
-<div class="line">        <span class="keywordtype">float</span> pressure, temperature;</div>
-<div class="line">        <a class="code hl_function" href="group__group__board__libs.html#ga49260774f4b0e4a40a02d9a65ac3b16b">xensiv_dps3xx_read</a>(&amp;pressure_sensor, &amp;pressure, &amp;temperature);</div>
+<div class="line">        CY_ASSERT(0);</div>
+<div class="line">    }</div>
 <div class="line"> </div>
-<div class="line">        printf(<span class="stringliteral">&quot;Pressure   : %8f\r\n&quot;</span>, pressure);</div>
-<div class="line">        printf(<span class="stringliteral">&quot;Temperature: %8f\r\n\r\n&quot;</span>, temperature);</div>
+<div class="line">    Cy_SCB_I2C_Enable(CYBSP_I2C_CONTROLLER_HW);</div>
 <div class="line"> </div>
-<div class="line">        cyhal_system_delay_ms(1000);</div>
+<div class="line">    /* Configures the I2C master interface with the desired clock frequency. */</div>
+<div class="line">    result = mtb_hal_i2c_setup(&amp;CYBSP_I2C_CONTROLLER_hal_obj,</div>
+<div class="line">                               &amp;CYBSP_I2C_CONTROLLER_hal_config,</div>
+<div class="line">                               &amp;i2c_controller_context,</div>
+<div class="line">                               NULL);</div>
+<div class="line"> </div>
+<div class="line">    if (CY_RSLT_SUCCESS != result)</div>
+<div class="line">    {</div>
+<div class="line">        CY_ASSERT(0);</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    /* Initializes pressure sensor. */</div>
+<div class="line">    result = mtb_xensiv_dps3xx_init_i2c(&amp;pressure_sensor, &amp;CYBSP_I2C_CONTROLLER_hal_obj,</div>
+<div class="line">                                        XENSIV_DPS3XX_I2C_ADDR_DEFAULT);</div>
+<div class="line">    if (CY_RSLT_SUCCESS != result)</div>
+<div class="line">    {</div>
+<div class="line">        CY_ASSERT(0);</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    for (;;)</div>
+<div class="line">    {</div>
+<div class="line">        /* Gets the pressure and temperature data and print the results to the UART. */</div>
+<div class="line">        float pressure, temperature;</div>
+<div class="line">        xensiv_dps3xx_read(&amp;pressure_sensor, &amp;pressure, &amp;temperature);</div>
+<div class="line"> </div>
+<div class="line">        printf(&quot;Pressure   : %8f\r\n&quot;, (double)pressure);</div>
+<div class="line">        printf(&quot;Temperature: %8f\r\n\r\n&quot;, (double)temperature);</div>
+<div class="line"> </div>
+<div class="line">        Cy_SysLib_Delay(1000);</div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="ttc" id="agroup__group__board__libs_html_ga49260774f4b0e4a40a02d9a65ac3b16b"><div class="ttname"><a href="group__group__board__libs.html#ga49260774f4b0e4a40a02d9a65ac3b16b">xensiv_dps3xx_read</a></div><div class="ttdeci">cy_rslt_t xensiv_dps3xx_read(xensiv_dps3xx_t *obj, float *pressure, float *temperature)</div><div class="ttdoc">Gets the current pressure and temperature values from the sensor.</div><div class="ttdef"><b>Definition:</b> xensiv_dps3xx.c:739</div></div>
-<div class="ttc" id="agroup__group__board__libs_html_gga788a5c414e6bf81811f38bd5d776774ca83077c0196f24e69990a6cbb91de4d58"><div class="ttname"><a href="group__group__board__libs.html#gga788a5c414e6bf81811f38bd5d776774ca83077c0196f24e69990a6cbb91de4d58">XENSIV_DPS3XX_I2C_ADDR_DEFAULT</a></div><div class="ttdeci">@ XENSIV_DPS3XX_I2C_ADDR_DEFAULT</div><div class="ttdoc">Default I2C address (0x77)</div><div class="ttdef"><b>Definition:</b> xensiv_dps3xx.h:84</div></div>
-<div class="ttc" id="agroup__group__board__libs_html_structxensiv__dps3xx__t"><div class="ttname"><a href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a></div><div class="ttdoc">Structure of pressure sensor context.</div><div class="ttdef"><b>Definition:</b> xensiv_dps3xx.h:211</div></div>
 </div><!-- fragment --></li>
-<li>Build the application and program the kit.</li>
+<li>Builds the application and program the kit</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md3"></a>
-More information</h2>
+<h1><a class="anchor" id="autotoc_md3"></a>
+More information</h1>
+<p >For more information, see the following documents:</p>
 <ul>
-<li><a href="https://infineon.github.io/sensor-xensiv-dps3xx/html/index.html">API Reference Guide</a></li>
-<li><a href="https://www.infineon.com">Infineon Technologies</a></li>
-<li><a href="https://github.com/infineon">Infineon GitHub</a></li>
-<li><a href="https://www.cypress.com/products/modustoolbox-software-environment">ModusToolbox™</a></li>
+<li><a href="https://infineon.github.io/sensor-xensiv-dps3xx/html/index.html">API reference guide</a></li>
+<li><a href="https://www.infineon.com/modustoolbox">ModusToolbox&trade; software environment, quick start guide, documentation, and videos</a></li>
+<li><a href="https://www.infineon.com/AN235935">AN235935</a> – Getting started with PSOC&trade; Edge MCU on ModusToolbox&trade; application note</li>
+<li><a href="https://www.infineon.com">Infineon Technologies AG</a></li>
 </ul>
 <hr  />
-<p> © Infineon Technologies, 2021. </p>
+<p> © 2025, Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation. </p>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -173,7 +192,7 @@ More information</h2>
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>XENSIV DPS3xx Pressure Sensor (sensor-xensiv-dps3xx)</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>Driver library to interface with XENSIV&trade; DPS-310/368 Barometric Pressure Sensors in ModusToolbox&trade;</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

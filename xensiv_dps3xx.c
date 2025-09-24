@@ -4,7 +4,7 @@
  * Description: This file is the public implementation of the DPS3xx pressure sensors.
  ***************************************************************************************************
  * \copyright
- * Copyright 2021-2022 Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2021-2025 Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -109,8 +109,8 @@
 //--------------------------------------------------------------------------------------------------
 // _xensiv_dps3xx_reg_read
 //--------------------------------------------------------------------------------------------------
-static cy_rslt_t _xensiv_dps3xx_reg_read(xensiv_dps3xx_t* obj, uint8_t reg_addr, uint8_t* data,
-                                         uint8_t length)
+cy_rslt_t _xensiv_dps3xx_reg_read(xensiv_dps3xx_t* obj, uint8_t reg_addr, uint8_t* data,
+                                  uint8_t length)
 {
     return obj->comm.read(obj->comm.context, obj->user_config.i2c_timeout, obj->i2c_address,
                           reg_addr, data, length);
@@ -120,8 +120,8 @@ static cy_rslt_t _xensiv_dps3xx_reg_read(xensiv_dps3xx_t* obj, uint8_t reg_addr,
 //--------------------------------------------------------------------------------------------------
 // _xensiv_dps3xx_reg_write
 //--------------------------------------------------------------------------------------------------
-static cy_rslt_t _xensiv_dps3xx_reg_write(xensiv_dps3xx_t* obj, uint8_t reg_addr, uint8_t* data,
-                                          uint8_t length)
+cy_rslt_t _xensiv_dps3xx_reg_write(xensiv_dps3xx_t* obj, uint8_t reg_addr, uint8_t* data,
+                                   uint8_t length)
 {
     return obj->comm.write(obj->comm.context, obj->user_config.i2c_timeout, obj->i2c_address,
                            reg_addr, data, length);
@@ -190,7 +190,7 @@ static cy_rslt_t _xensiv_dps3xx_wait_data_ready(xensiv_dps3xx_t* obj, bool press
     bool ready = false, pressure_ready = false, temp_ready = false;
     cy_rslt_t rc = CY_RSLT_SUCCESS;
     bool retry = true;
-    for (int i = 0; i < (obj->user_config.data_timeout && retry); i++)
+    for (uint16_t i = 0; i < (obj->user_config.data_timeout && retry); i++)
     {
         rc = xensiv_dps3xx_check_ready(obj, &pressure_ready, &temp_ready);
         ready = (!pressure || pressure_ready) && (!temp || temp_ready);
@@ -251,13 +251,13 @@ static _xensiv_dps3xx_scaling_coeffs_t _xensiv_dps3xx_get_scaling_coef(
 //--------------------------------------------------------------------------------------------------
 // _xensiv_dps3xx_calc_temperature
 //--------------------------------------------------------------------------------------------------
-static float _xensiv_dps3xx_calc_temperature(xensiv_dps3xx_t* obj, int32_t temp_raw)
+cy_float32_t _xensiv_dps3xx_calc_temperature(xensiv_dps3xx_t* obj, int32_t temp_raw)
 {
     if (temp_raw > POW_2_23_MINUS_1)
     {
         temp_raw -= POW_2_24;
     }
-    obj->temp_scaled = (float)temp_raw / (float)obj->tmp_osr_scale_coeff;
+    obj->temp_scaled = (cy_float32_t)temp_raw / (cy_float32_t)obj->tmp_osr_scale_coeff;
 
     int64_t c0 = obj->calib_coeffs.C0;
     int64_t c1 = obj->calib_coeffs.C1;
@@ -268,14 +268,14 @@ static float _xensiv_dps3xx_calc_temperature(xensiv_dps3xx_t* obj, int32_t temp_
 //--------------------------------------------------------------------------------------------------
 // _xensiv_dps3xx_calc_pressure
 //--------------------------------------------------------------------------------------------------
-static float _xensiv_dps3xx_calc_pressure(xensiv_dps3xx_t* obj, int32_t press_raw)
+cy_float32_t _xensiv_dps3xx_calc_pressure(xensiv_dps3xx_t* obj, int32_t press_raw)
 {
     if (press_raw > POW_2_23_MINUS_1)
     {
         press_raw -= POW_2_24;
     }
 
-    float press_scaled = (float)press_raw / obj->prs_osr_scale_coeff;
+    cy_float32_t press_scaled = (cy_float32_t)press_raw / obj->prs_osr_scale_coeff;
     int64_t c00 = obj->calib_coeffs.C00;
     int64_t c10 = obj->calib_coeffs.C10;
     int64_t c20 = obj->calib_coeffs.C20;
@@ -284,10 +284,10 @@ static float _xensiv_dps3xx_calc_pressure(xensiv_dps3xx_t* obj, int32_t press_ra
     int64_t c11 = obj->calib_coeffs.C11;
     int64_t c21 = obj->calib_coeffs.C21;
 
-    float Pcal = c00
-                 + (press_scaled * (c10 + press_scaled * (c20 + press_scaled * c30)))
-                 + (obj->temp_scaled * c01)
-                 + (obj->temp_scaled * (press_scaled * (c11 + press_scaled * c21)));
+    cy_float32_t Pcal = c00
+                        + (press_scaled * (c10 + press_scaled * (c20 + press_scaled * c30)))
+                        + (obj->temp_scaled * c01)
+                        + (obj->temp_scaled * (press_scaled * (c11 + press_scaled * c21)));
     return Pcal * 0.01f;
 }
 
@@ -518,10 +518,10 @@ static cy_rslt_t _xensiv_dps3xx_read_raw_values(xensiv_dps3xx_t* obj, uint8_t* r
 // _xensiv_dps3xx_convert_raw_values
 //--------------------------------------------------------------------------------------------------
 static void _xensiv_dps3xx_convert_raw_values(xensiv_dps3xx_t* obj, uint8_t* raw_value,
-                                              float* pressure, float* temperature)
+                                              cy_float32_t* pressure, cy_float32_t* temperature)
 {
     int32_t press_raw, temp_raw;
-    float pres = 0, temp = 0;
+    cy_float32_t pres = 0, temp = 0;
 
     switch (obj->user_config.dev_mode)
     {
@@ -685,8 +685,8 @@ cy_rslt_t xensiv_dps3xx_set_config(xensiv_dps3xx_t* obj, xensiv_dps3xx_config_t*
                                                    config->temperature_rate);
     }
     if ((CY_RSLT_SUCCESS == rc) &&
-        ((config->pressure_rate != obj->user_config.temperature_rate) ||
-         (config->pressure_oversample != obj->user_config.temperature_oversample)))
+        ((config->pressure_rate != obj->user_config.pressure_rate) ||
+         (config->pressure_oversample != obj->user_config.pressure_oversample)))
     {
         rc = _xensiv_dps3xx_set_pressure_config(obj, config->pressure_oversample,
                                                 config->pressure_rate);
@@ -736,7 +736,8 @@ cy_rslt_t xensiv_dps3xx_check_ready(xensiv_dps3xx_t* obj, bool* pressure_ready,
 //--------------------------------------------------------------------------------------------------
 // xensiv_dps3xx_read
 //--------------------------------------------------------------------------------------------------
-cy_rslt_t xensiv_dps3xx_read(xensiv_dps3xx_t* obj, float* pressure, float* temperature)
+cy_rslt_t xensiv_dps3xx_read(xensiv_dps3xx_t* obj, cy_float32_t* pressure,
+                             cy_float32_t* temperature)
 {
     uint8_t read_buffer[XENSIV_DPS3XX_PSR_TMP_READ_LEN];
 

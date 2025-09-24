@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>XENSIV DPS3xx Pressure Sensor (sensor-xensiv-dps3xx)</title>
+<title>Driver library to interface with XENSIV&trade; DPS-310/368 Barometric Pressure Sensors in ModusToolbox&trade;</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><a href="http://www.cypress.com/"><img alt="Logo" src="logo.png"/></a></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">XENSIV DPS3xx Pressure Sensor (sensor-xensiv-dps3xx)</div>
+   <div id="projectname">Driver library to interface with XENSIV&trade; DPS-310/368 Barometric Pressure Sensors in ModusToolbox&trade;</div>
   </td>
  </tr>
  </tbody>
@@ -93,22 +93,44 @@ $(document).ready(function(){initNavTree('group__group__board__libs.html',''); i
 </div><!--header-->
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">General Description</h2>
-<p >Basic set of APIs for interacting with the XENSIV™ DPS3xx pressure sensors. </p>
-<p >This provides basic initialization and access to to the pressure &amp; temperature data. It also provides access to the configuration settings for the sensor for full control. More information about the motion sensor is available at: <a href="https://www.infineon.com/cms/en/product/sensor/pressure-sensors/pressure-sensors-for-iot/">https://www.infineon.com/cms/en/product/sensor/pressure-sensors/pressure-sensors-for-iot/</a></p>
+<p >Basic set of APIs for interacting with the XENSIV&trade; DPS3xx pressure sensors. </p>
+<p >This provides basic initialization and access to to the pressure &amp; temperature data. It also provides access to the configuration settings for the sensor for full control. More information about the motion sensor is available at: <a href="https://www.infineon.com/products/sensor/pressure-sensors/pressure-sensors-for-iot">https://www.infineon.com/products/sensor/pressure-sensors/pressure-sensors-for-iot</a></p>
 <dl class="section note"><dt>Note</dt><dd>This library uses delays while waiting for the sensor. If the RTOS_AWARE component is set or CY_RTOS_AWARE is defined, the driver will defer to the RTOS for delays. Because of this, it is not safe to call any functions other than <a class="el" href="group__group__board__libs.html#gaa2b10dc2493b218911352227d71b370c">xensiv_dps3xx_init_i2c</a> until after the RTOS scheduler has started.</dd></dl>
 <h1><a class="anchor" id="subsection_board_libs_snippets"></a>
 Code snippets</h1>
 <h2><a class="anchor" id="subsection_board_libs_snippet_1"></a>
 Snippet 1: Simple initialization with I2C.</h2>
-<p >The following snippet initializes an I2C instance and the DPS3xx. </p><div class="fragment"><div class="line">    <span class="comment">/* Initialize i2c for pressure sensor */</span></div>
-<div class="line">    result = cyhal_i2c_init(&amp;i2c, CYBSP_I2C_SDA, CYBSP_I2C_SCL, NULL);</div>
-<div class="line">    CY_ASSERT(result == CY_RSLT_SUCCESS);</div>
-<div class="line">    result = cyhal_i2c_configure(&amp;i2c, &amp;i2c_cfg);</div>
-<div class="line">    CY_ASSERT(result == CY_RSLT_SUCCESS);</div>
+<p >The following snippet initializes an I2C instance and the DPS3xx. </p><div class="fragment"><div class="line">    <span class="comment">/* Initializes I2C. */</span></div>
+<div class="line">    result = Cy_SCB_I2C_Init(CYBSP_I2C_CONTROLLER_HW,</div>
+<div class="line">                             &amp;CYBSP_I2C_CONTROLLER_config,</div>
+<div class="line">                             &amp;i2c_controller_context);</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">/* Initialize pressure sensor */</span></div>
-<div class="line">    result = xensiv_dps3xx_mtb_init_i2c(&amp;pressure_sensor, &amp;i2c, <a class="code hl_enumvalue" href="group__group__board__libs.html#gga788a5c414e6bf81811f38bd5d776774ca83077c0196f24e69990a6cbb91de4d58">XENSIV_DPS3XX_I2C_ADDR_DEFAULT</a>);</div>
-<div class="line">    CY_ASSERT(result == CY_RSLT_SUCCESS);</div>
+<div class="line">    <span class="keywordflow">if</span> (CY_RSLT_SUCCESS != result)</div>
+<div class="line">    {</div>
+<div class="line">        CY_ASSERT(0);</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    Cy_SCB_I2C_Enable(CYBSP_I2C_CONTROLLER_HW);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">/* Configures the I2C master interface with the desired clock frequency. */</span></div>
+<div class="line">    result = mtb_hal_i2c_setup(&amp;CYBSP_I2C_CONTROLLER_hal_obj,</div>
+<div class="line">                               &amp;CYBSP_I2C_CONTROLLER_hal_config,</div>
+<div class="line">                               &amp;i2c_controller_context,</div>
+<div class="line">                               NULL);</div>
+<div class="line"> </div>
+<div class="line">    <span class="keywordflow">if</span> (CY_RSLT_SUCCESS != result)</div>
+<div class="line">    {</div>
+<div class="line">        CY_ASSERT(0);</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">/* Initializes pressure sensor. */</span></div>
+<div class="line">    result = <a class="code hl_function" href="group__group__board__libs.html#ga4fe86e5b638b41c99fde96b0153efb30">mtb_xensiv_dps3xx_init_i2c</a>(&amp;pressure_sensor, &amp;CYBSP_I2C_CONTROLLER_hal_obj,</div>
+<div class="line">                                        <a class="code hl_enumvalue" href="group__group__board__libs.html#gga788a5c414e6bf81811f38bd5d776774ca83077c0196f24e69990a6cbb91de4d58">XENSIV_DPS3XX_I2C_ADDR_DEFAULT</a>);</div>
+<div class="line">    <span class="keywordflow">if</span> (CY_RSLT_SUCCESS != result)</div>
+<div class="line">    {</div>
+<div class="line">        CY_ASSERT(0);</div>
+<div class="line">    }</div>
+<div class="ttc" id="agroup__group__board__libs_html_ga4fe86e5b638b41c99fde96b0153efb30"><div class="ttname"><a href="group__group__board__libs.html#ga4fe86e5b638b41c99fde96b0153efb30">mtb_xensiv_dps3xx_init_i2c</a></div><div class="ttdeci">cy_rslt_t mtb_xensiv_dps3xx_init_i2c(xensiv_dps3xx_t *obj, mtb_hal_i2c_t *i2c, xensiv_dps3xx_i2c_addr_t i2c_addr)</div><div class="ttdoc">Initialize the DPS sensor, and configures it to use the specified I2C peripheral.</div><div class="ttdef"><b>Definition:</b> mtb_xensiv_dps3xx.c:127</div></div>
 <div class="ttc" id="agroup__group__board__libs_html_gga788a5c414e6bf81811f38bd5d776774ca83077c0196f24e69990a6cbb91de4d58"><div class="ttname"><a href="group__group__board__libs.html#gga788a5c414e6bf81811f38bd5d776774ca83077c0196f24e69990a6cbb91de4d58">XENSIV_DPS3XX_I2C_ADDR_DEFAULT</a></div><div class="ttdeci">@ XENSIV_DPS3XX_I2C_ADDR_DEFAULT</div><div class="ttdoc">Default I2C address (0x77)</div><div class="ttdef"><b>Definition:</b> xensiv_dps3xx.h:84</div></div>
 </div><!-- fragment --><h2><a class="anchor" id="subsection_board_libs_snippet_2"></a>
 Snippet 2: Sensor configuration.</h2>
@@ -134,18 +156,18 @@ Snippet 2: Sensor configuration.</h2>
 <div class="ttc" id="agroup__group__board__libs_html_structxensiv__dps3xx__config__t"><div class="ttname"><a href="group__group__board__libs.html#structxensiv__dps3xx__config__t">xensiv_dps3xx_config_t</a></div><div class="ttdoc">Structure of configuration parameters for the pressure sensor.</div><div class="ttdef"><b>Definition:</b> xensiv_dps3xx.h:187</div></div>
 </div><!-- fragment --><h2><a class="anchor" id="subsection_board_libs_snippet_3"></a>
 Snippet 3: Reading from the sensor.</h2>
-<p >The following snippet demonstrates how to read data from the sensor. </p><div class="fragment"><div class="line">    <span class="keywordflow">while</span> (measure_data)</div>
+<p >The following snippet demonstrates how to read data from the sensor. </p><div class="fragment"><div class="line">    <span class="keywordflow">for</span> (;;)</div>
 <div class="line">    {</div>
-<div class="line">        <span class="comment">/* Get the pressure and temperature data and print the results to the UART */</span></div>
+<div class="line">        <span class="comment">/* Gets the pressure and temperature data and print the results to the UART. */</span></div>
 <div class="line">        <span class="keywordtype">float</span> pressure, temperature;</div>
-<div class="line">        <a class="code hl_function" href="group__group__board__libs.html#ga49260774f4b0e4a40a02d9a65ac3b16b">xensiv_dps3xx_read</a>(&amp;pressure_sensor, &amp;pressure, &amp;temperature);</div>
+<div class="line">        <a class="code hl_function" href="group__group__board__libs.html#gaf1b8cb406b43a8732fe365dda37558d0">xensiv_dps3xx_read</a>(&amp;pressure_sensor, &amp;pressure, &amp;temperature);</div>
 <div class="line"> </div>
 <div class="line">        printf(<span class="stringliteral">&quot;Pressure   : %8f\r\n&quot;</span>, (<span class="keywordtype">double</span>)pressure);</div>
-<div class="line">        printf(<span class="stringliteral">&quot;Temperature: :%8f\r\n\r\n&quot;</span>, (<span class="keywordtype">double</span>)temperature);</div>
+<div class="line">        printf(<span class="stringliteral">&quot;Temperature: %8f\r\n\r\n&quot;</span>, (<span class="keywordtype">double</span>)temperature);</div>
 <div class="line"> </div>
-<div class="line">        cyhal_system_delay_ms(1000);</div>
+<div class="line">        Cy_SysLib_Delay(1000);</div>
 <div class="line">    }</div>
-<div class="ttc" id="agroup__group__board__libs_html_ga49260774f4b0e4a40a02d9a65ac3b16b"><div class="ttname"><a href="group__group__board__libs.html#ga49260774f4b0e4a40a02d9a65ac3b16b">xensiv_dps3xx_read</a></div><div class="ttdeci">cy_rslt_t xensiv_dps3xx_read(xensiv_dps3xx_t *obj, float *pressure, float *temperature)</div><div class="ttdoc">Gets the current pressure and temperature values from the sensor.</div><div class="ttdef"><b>Definition:</b> xensiv_dps3xx.c:739</div></div>
+<div class="ttc" id="agroup__group__board__libs_html_gaf1b8cb406b43a8732fe365dda37558d0"><div class="ttname"><a href="group__group__board__libs.html#gaf1b8cb406b43a8732fe365dda37558d0">xensiv_dps3xx_read</a></div><div class="ttdeci">cy_rslt_t xensiv_dps3xx_read(xensiv_dps3xx_t *obj, cy_float32_t *pressure, cy_float32_t *temperature)</div><div class="ttdoc">Gets the current pressure and temperature values from the sensor.</div><div class="ttdef"><b>Definition:</b> xensiv_dps3xx.c:739</div></div>
 </div><!-- fragment --> <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Data Structures</h2></td></tr>
@@ -268,6 +290,21 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ga4fe86e5b638b41c99fde96b0153efb30"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga4fe86e5b638b41c99fde96b0153efb30">mtb_xensiv_dps3xx_init_i2c</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, mtb_hal_i2c_t *i2c, <a class="el" href="group__group__board__libs.html#ga788a5c414e6bf81811f38bd5d776774c">xensiv_dps3xx_i2c_addr_t</a> i2c_addr)</td></tr>
+<tr class="memdesc:ga4fe86e5b638b41c99fde96b0153efb30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the DPS sensor, and configures it to use the specified I2C peripheral.  <a href="group__group__board__libs.html#ga4fe86e5b638b41c99fde96b0153efb30">More...</a><br /></td></tr>
+<tr class="separator:ga4fe86e5b638b41c99fde96b0153efb30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga298d65417261594c3c7ee0a504adb265"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga298d65417261594c3c7ee0a504adb265">mtb_xensiv_dps3xx_reg_read</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, uint8_t reg_addr, uint8_t *data, uint8_t length)</td></tr>
+<tr class="memdesc:ga298d65417261594c3c7ee0a504adb265"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read from register.  <a href="group__group__board__libs.html#ga298d65417261594c3c7ee0a504adb265">More...</a><br /></td></tr>
+<tr class="separator:ga298d65417261594c3c7ee0a504adb265"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga33b7b0a5864efd53b23aea745090c7e0"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga33b7b0a5864efd53b23aea745090c7e0">mtb_xensiv_dps3xx_reg_write</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, uint8_t reg_addr, uint8_t *data, uint8_t length)</td></tr>
+<tr class="memdesc:ga33b7b0a5864efd53b23aea745090c7e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write to register.  <a href="group__group__board__libs.html#ga33b7b0a5864efd53b23aea745090c7e0">More...</a><br /></td></tr>
+<tr class="separator:ga33b7b0a5864efd53b23aea745090c7e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf9a907b86d536d3cead47bd2264cdc84"><td class="memItemLeft" align="right" valign="top">cy_float32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gaf9a907b86d536d3cead47bd2264cdc84">mtb_xensiv_dps3xx_calc_temperature</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, int32_t temp_raw)</td></tr>
+<tr class="memdesc:gaf9a907b86d536d3cead47bd2264cdc84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate temperature value from raw temperature data.  <a href="group__group__board__libs.html#gaf9a907b86d536d3cead47bd2264cdc84">More...</a><br /></td></tr>
+<tr class="separator:gaf9a907b86d536d3cead47bd2264cdc84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadb41af406f5147a09904b51a1d791243"><td class="memItemLeft" align="right" valign="top">cy_float32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gadb41af406f5147a09904b51a1d791243">mtb_xensiv_dps3xx_calc_pressure</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, int32_t press_raw)</td></tr>
+<tr class="memdesc:gadb41af406f5147a09904b51a1d791243"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate pressure value from raw pressure data.  <a href="group__group__board__libs.html#gadb41af406f5147a09904b51a1d791243">More...</a><br /></td></tr>
+<tr class="separator:gadb41af406f5147a09904b51a1d791243"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa2b10dc2493b218911352227d71b370c"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gaa2b10dc2493b218911352227d71b370c">xensiv_dps3xx_init_i2c</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, const <a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__i2c__comm__t">xensiv_dps3xx_i2c_comm_t</a> *functions, <a class="el" href="group__group__board__libs.html#ga788a5c414e6bf81811f38bd5d776774c">xensiv_dps3xx_i2c_addr_t</a> i2c_addr)</td></tr>
 <tr class="memdesc:gaa2b10dc2493b218911352227d71b370c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the DPS sensor, and configures it to use the specified I2C peripheral.  <a href="group__group__board__libs.html#gaa2b10dc2493b218911352227d71b370c">More...</a><br /></td></tr>
 <tr class="separator:gaa2b10dc2493b218911352227d71b370c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -280,15 +317,27 @@ Functions</h2></td></tr>
 <tr class="memitem:ga57f74c704f6b0885e66900a738af3947"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga57f74c704f6b0885e66900a738af3947">xensiv_dps3xx_get_revision_id</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, uint8_t *revision_id)</td></tr>
 <tr class="memdesc:ga57f74c704f6b0885e66900a738af3947"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the sensor revision number.  <a href="group__group__board__libs.html#ga57f74c704f6b0885e66900a738af3947">More...</a><br /></td></tr>
 <tr class="separator:ga57f74c704f6b0885e66900a738af3947"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga49260774f4b0e4a40a02d9a65ac3b16b"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga49260774f4b0e4a40a02d9a65ac3b16b">xensiv_dps3xx_read</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, float *pressure, float *temperature)</td></tr>
-<tr class="memdesc:ga49260774f4b0e4a40a02d9a65ac3b16b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current pressure and temperature values from the sensor.  <a href="group__group__board__libs.html#ga49260774f4b0e4a40a02d9a65ac3b16b">More...</a><br /></td></tr>
-<tr class="separator:ga49260774f4b0e4a40a02d9a65ac3b16b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf1b8cb406b43a8732fe365dda37558d0"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gaf1b8cb406b43a8732fe365dda37558d0">xensiv_dps3xx_read</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, cy_float32_t *pressure, cy_float32_t *temperature)</td></tr>
+<tr class="memdesc:gaf1b8cb406b43a8732fe365dda37558d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current pressure and temperature values from the sensor.  <a href="group__group__board__libs.html#gaf1b8cb406b43a8732fe365dda37558d0">More...</a><br /></td></tr>
+<tr class="separator:gaf1b8cb406b43a8732fe365dda37558d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabec006d96526dc6cf237b239abc2a96d"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gabec006d96526dc6cf237b239abc2a96d">xensiv_dps3xx_check_ready</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, bool *pressure_ready, bool *temperature_ready)</td></tr>
 <tr class="memdesc:gabec006d96526dc6cf237b239abc2a96d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets whether the pressure sensor has new pressure/temperature data ready to be read.  <a href="group__group__board__libs.html#gabec006d96526dc6cf237b239abc2a96d">More...</a><br /></td></tr>
 <tr class="separator:gabec006d96526dc6cf237b239abc2a96d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac7b9471f1027ff38e38503eaaf570b6f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#gac7b9471f1027ff38e38503eaaf570b6f">xensiv_dps3xx_free</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj)</td></tr>
 <tr class="memdesc:gac7b9471f1027ff38e38503eaaf570b6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees up any resources allocated by the motion_sensor as part of <a class="el" href="group__group__board__libs.html#gaa2b10dc2493b218911352227d71b370c">xensiv_dps3xx_init_i2c()</a>.  <a href="group__group__board__libs.html#gac7b9471f1027ff38e38503eaaf570b6f">More...</a><br /></td></tr>
 <tr class="separator:gac7b9471f1027ff38e38503eaaf570b6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3ea9c368a3d42802edbab04451be728f"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga3ea9c368a3d42802edbab04451be728f">_xensiv_dps3xx_reg_read</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, uint8_t reg_addr, uint8_t *data, uint8_t length)</td></tr>
+<tr class="memdesc:ga3ea9c368a3d42802edbab04451be728f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read from register.  <a href="group__group__board__libs.html#ga3ea9c368a3d42802edbab04451be728f">More...</a><br /></td></tr>
+<tr class="separator:ga3ea9c368a3d42802edbab04451be728f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga070366e4effebd1a1d7eba0bba6ca103"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga070366e4effebd1a1d7eba0bba6ca103">_xensiv_dps3xx_reg_write</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, uint8_t reg_addr, uint8_t *data, uint8_t length)</td></tr>
+<tr class="memdesc:ga070366e4effebd1a1d7eba0bba6ca103"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write to register.  <a href="group__group__board__libs.html#ga070366e4effebd1a1d7eba0bba6ca103">More...</a><br /></td></tr>
+<tr class="separator:ga070366e4effebd1a1d7eba0bba6ca103"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga82efb4ea32412698adbfbdbb2fc88a73"><td class="memItemLeft" align="right" valign="top">cy_float32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga82efb4ea32412698adbfbdbb2fc88a73">_xensiv_dps3xx_calc_temperature</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, int32_t temp_raw)</td></tr>
+<tr class="memdesc:ga82efb4ea32412698adbfbdbb2fc88a73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate temperature value from raw temperature data.  <a href="group__group__board__libs.html#ga82efb4ea32412698adbfbdbb2fc88a73">More...</a><br /></td></tr>
+<tr class="separator:ga82efb4ea32412698adbfbdbb2fc88a73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga168b3f6eb6b8ed726168d78b3c806f92"><td class="memItemLeft" align="right" valign="top">cy_float32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__board__libs.html#ga168b3f6eb6b8ed726168d78b3c806f92">_xensiv_dps3xx_calc_pressure</a> (<a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *obj, int32_t press_raw)</td></tr>
+<tr class="memdesc:ga168b3f6eb6b8ed726168d78b3c806f92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate pressure value from raw pressure data.  <a href="group__group__board__libs.html#ga168b3f6eb6b8ed726168d78b3c806f92">More...</a><br /></td></tr>
+<tr class="separator:ga168b3f6eb6b8ed726168d78b3c806f92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/><h2 class="groupheader">Data Structure Documentation</h2>
 <a name="structxensiv__dps3xx__config__t" id="structxensiv__dps3xx__config__t"></a>
@@ -435,7 +484,7 @@ i2c_address</td>
 <td class="fielddoc">
 Sensor slave address. </td></tr>
 <tr><td class="fieldtype">
-<a id="aeb8b0ee53ca24bd5aff2e9351e0ee5c4" name="aeb8b0ee53ca24bd5aff2e9351e0ee5c4"></a>float</td>
+<a id="abbe4a6db7840e7d84ab9b0a83b85a6a1" name="abbe4a6db7840e7d84ab9b0a83b85a6a1"></a>cy_float32_t</td>
 <td class="fieldname">
 temp_scaled</td>
 <td class="fielddoc">
@@ -626,6 +675,233 @@ Should always be set MEMS. </td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="ga4fe86e5b638b41c99fde96b0153efb30" name="ga4fe86e5b638b41c99fde96b0153efb30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4fe86e5b638b41c99fde96b0153efb30">&#9670;&nbsp;</a></span>mtb_xensiv_dps3xx_init_i2c()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cy_rslt_t mtb_xensiv_dps3xx_init_i2c </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">mtb_hal_i2c_t *&#160;</td>
+          <td class="paramname"><em>i2c</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__group__board__libs.html#ga788a5c414e6bf81811f38bd5d776774c">xensiv_dps3xx_i2c_addr_t</a>&#160;</td>
+          <td class="paramname"><em>i2c_addr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize the DPS sensor, and configures it to use the specified I2C peripheral. </p>
+<p >By default it is configured in command mode.</p>
+<p >This is equivalent to <a class="el" href="group__group__board__libs.html#gaa2b10dc2493b218911352227d71b370c">xensiv_dps3xx_init_i2c()</a> but automatically sets up the function pointers based on the provided I2C object.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">obj</td><td>Pointer to an pressure sensor object. The caller must allocate the memory for this object but the init function will initialize its contents. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">i2c</td><td>Pointer to an initialized I2C object. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">i2c_addr</td><td>I2C address to use when communicating with the sensor. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if properly initialized, else an error indicating what went wrong. </dd></dl>
+
+</div>
+</div>
+<a id="ga298d65417261594c3c7ee0a504adb265" name="ga298d65417261594c3c7ee0a504adb265"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga298d65417261594c3c7ee0a504adb265">&#9670;&nbsp;</a></span>mtb_xensiv_dps3xx_reg_read()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cy_rslt_t mtb_xensiv_dps3xx_reg_read </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>reg_addr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read from register. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">obj</td><td>Pointer to a pressure sensor object </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">reg_addr</td><td>Indicate register address </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>Data to read </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">length</td><td>length of data </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the check succeeded, else an error indicating what went wrong. </dd></dl>
+
+</div>
+</div>
+<a id="ga33b7b0a5864efd53b23aea745090c7e0" name="ga33b7b0a5864efd53b23aea745090c7e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga33b7b0a5864efd53b23aea745090c7e0">&#9670;&nbsp;</a></span>mtb_xensiv_dps3xx_reg_write()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cy_rslt_t mtb_xensiv_dps3xx_reg_write </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>reg_addr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write to register. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">obj</td><td>Pointer to a pressure sensor object </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">reg_addr</td><td>Indicate register address </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>Data to write </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">length</td><td>length of data </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the check succeeded, else an error indicating what went wrong. </dd></dl>
+
+</div>
+</div>
+<a id="gaf9a907b86d536d3cead47bd2264cdc84" name="gaf9a907b86d536d3cead47bd2264cdc84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf9a907b86d536d3cead47bd2264cdc84">&#9670;&nbsp;</a></span>mtb_xensiv_dps3xx_calc_temperature()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cy_float32_t mtb_xensiv_dps3xx_calc_temperature </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>temp_raw</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Calculate temperature value from raw temperature data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">obj</td><td>Pointer to a pressure sensor object </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">temp_raw</td><td>Temperature raw data</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>cy_float32_t 32-bit single-precision floating-point number </dd></dl>
+
+</div>
+</div>
+<a id="gadb41af406f5147a09904b51a1d791243" name="gadb41af406f5147a09904b51a1d791243"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadb41af406f5147a09904b51a1d791243">&#9670;&nbsp;</a></span>mtb_xensiv_dps3xx_calc_pressure()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cy_float32_t mtb_xensiv_dps3xx_calc_pressure </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>press_raw</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Calculate pressure value from raw pressure data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">obj</td><td>Pointer to a pressure sensor object </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">press_raw</td><td>Pressure raw data</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>cy_float32_t 32-bit single-precision floating-point number </dd></dl>
+
+</div>
+</div>
 <a id="gaa2b10dc2493b218911352227d71b370c" name="gaa2b10dc2493b218911352227d71b370c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gaa2b10dc2493b218911352227d71b370c">&#9670;&nbsp;</a></span>xensiv_dps3xx_init_i2c()</h2>
 
@@ -660,7 +936,7 @@ Should always be set MEMS. </td></tr>
 
 <p>Initialize the DPS sensor, and configures it to use the specified I2C peripheral. </p>
 <p >By default it is configured in command mode.</p>
-<dl class="section note"><dt>Note</dt><dd>A ModusToolbox™ HAL based equivalent, xensiv_dps3xx_mtb_init_i2c(), is also available</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>A ModusToolbox&trade; HAL based equivalent, <a class="el" href="group__group__board__libs.html#ga4fe86e5b638b41c99fde96b0153efb30" title="Initialize the DPS sensor, and configures it to use the specified I2C peripheral.">mtb_xensiv_dps3xx_init_i2c()</a>, is also available</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">obj</td><td>Pointer to an pressure sensor object. The caller must allocate the memory for this object but the init function will initialize its contents. </td></tr>
@@ -788,8 +1064,8 @@ Should always be set MEMS. </td></tr>
 
 </div>
 </div>
-<a id="ga49260774f4b0e4a40a02d9a65ac3b16b" name="ga49260774f4b0e4a40a02d9a65ac3b16b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga49260774f4b0e4a40a02d9a65ac3b16b">&#9670;&nbsp;</a></span>xensiv_dps3xx_read()</h2>
+<a id="gaf1b8cb406b43a8732fe365dda37558d0" name="gaf1b8cb406b43a8732fe365dda37558d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf1b8cb406b43a8732fe365dda37558d0">&#9670;&nbsp;</a></span>xensiv_dps3xx_read()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -803,13 +1079,13 @@ Should always be set MEMS. </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">float *&#160;</td>
+          <td class="paramtype">cy_float32_t *&#160;</td>
           <td class="paramname"><em>pressure</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">float *&#160;</td>
+          <td class="paramtype">cy_float32_t *&#160;</td>
           <td class="paramname"><em>temperature</em>&#160;</td>
         </tr>
         <tr>
@@ -904,13 +1180,193 @@ Should always be set MEMS. </td></tr>
 
 </div>
 </div>
+<a id="ga3ea9c368a3d42802edbab04451be728f" name="ga3ea9c368a3d42802edbab04451be728f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3ea9c368a3d42802edbab04451be728f">&#9670;&nbsp;</a></span>_xensiv_dps3xx_reg_read()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cy_rslt_t _xensiv_dps3xx_reg_read </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>reg_addr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read from register. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">obj</td><td>Pointer to a pressure sensor object </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">reg_addr</td><td>Indicate register address </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>Data to read </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">length</td><td>length of data </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the check succeeded, else an error indicating what went wrong. </dd></dl>
+
+</div>
+</div>
+<a id="ga070366e4effebd1a1d7eba0bba6ca103" name="ga070366e4effebd1a1d7eba0bba6ca103"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga070366e4effebd1a1d7eba0bba6ca103">&#9670;&nbsp;</a></span>_xensiv_dps3xx_reg_write()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cy_rslt_t _xensiv_dps3xx_reg_write </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>reg_addr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write to register. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">obj</td><td>Pointer to a pressure sensor object </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">reg_addr</td><td>Indicate register address </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>Data to write </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">length</td><td>length of data </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the check succeeded, else an error indicating what went wrong. </dd></dl>
+
+</div>
+</div>
+<a id="ga82efb4ea32412698adbfbdbb2fc88a73" name="ga82efb4ea32412698adbfbdbb2fc88a73"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga82efb4ea32412698adbfbdbb2fc88a73">&#9670;&nbsp;</a></span>_xensiv_dps3xx_calc_temperature()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cy_float32_t _xensiv_dps3xx_calc_temperature </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>temp_raw</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Calculate temperature value from raw temperature data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">obj</td><td>Pointer to a pressure sensor object </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">temp_raw</td><td>Temperature raw data</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>cy_float32_t 32-bit single-precision floating-point number </dd></dl>
+
+</div>
+</div>
+<a id="ga168b3f6eb6b8ed726168d78b3c806f92" name="ga168b3f6eb6b8ed726168d78b3c806f92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga168b3f6eb6b8ed726168d78b3c806f92">&#9670;&nbsp;</a></span>_xensiv_dps3xx_calc_pressure()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cy_float32_t _xensiv_dps3xx_calc_pressure </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__board__libs.html#structxensiv__dps3xx__t">xensiv_dps3xx_t</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>press_raw</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Calculate pressure value from raw pressure data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">obj</td><td>Pointer to a pressure sensor object </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">press_raw</td><td>Pressure raw data</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>cy_float32_t 32-bit single-precision floating-point number </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part
 <div id="nav-path" class="navpath">
     <ul>
         <li class="footer">
-            Generated for <b>XENSIV DPS3xx Pressure Sensor (sensor-xensiv-dps3xx)</b> by <b>Cypress Semiconductor Corporation</b>.
+            Generated for <b>Driver library to interface with XENSIV&trade; DPS-310/368 Barometric Pressure Sensors in ModusToolbox&trade;</b> by <b>Cypress Semiconductor Corporation</b>.
             All rights reserved.
         </li>
     </ul>

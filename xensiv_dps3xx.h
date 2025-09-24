@@ -1,10 +1,10 @@
 /***********************************************************************************************//**
  * \file xensiv_dps3xx.h
  *
- * Description: This file is the public interface of the XENSIV™  DPS3xx pressure sensors.
+ * Description: This file is the public interface of the XENSIV&trade; DPS3xx pressure sensors.
  ***************************************************************************************************
  * \copyright
- * Copyright 2021-2022 Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2021-2025 Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -27,11 +27,11 @@
 /**
  * \addtogroup group_board_libs Pressure Sensor
  * \{
- * Basic set of APIs for interacting with the XENSIV™  DPS3xx pressure sensors. This provides basic
- * initialization and access to to the pressure & temperature data. It also provides access to the
- * configuration settings for the sensor for full control. More information about the motion sensor
- * is available at:
- * https://www.infineon.com/cms/en/product/sensor/pressure-sensors/pressure-sensors-for-iot/
+ * Basic set of APIs for interacting with the XENSIV&trade; DPS3xx pressure sensors. This provides
+ * basic initialization and access to to the pressure & temperature data. It also provides access
+ * to the configuration settings for the sensor for full control. More information about the
+ * motion sensor is available at:
+ * https://www.infineon.com/products/sensor/pressure-sensors/pressure-sensors-for-iot
  *
  * \note This library uses delays while waiting for the sensor. If the RTOS_AWARE component is set
  * or CY_RTOS_AWARE is defined, the driver will defer to the RTOS for delays. Because of this, it is
@@ -213,7 +213,7 @@ typedef struct
     xensiv_dps3xx_config_t          user_config;            /**< User configuration settings */
     xensiv_dps3xx_i2c_addr_t        i2c_address;            /**< Sensor slave address */
 
-    float                           temp_scaled;            /**< sensor */
+    cy_float32_t                       temp_scaled;            /**< sensor */
     uint8_t                         meas_cfg;               /**< sensor */
     _xensiv_dps3xx_scaling_coeffs_t tmp_osr_scale_coeff;    /**< Temperature scaling coefficient */
     _xensiv_dps3xx_scaling_coeffs_t prs_osr_scale_coeff;    /**< Pressure scaling coefficient */
@@ -224,7 +224,7 @@ typedef struct
 /** Initialize the DPS sensor, and configures it to use the specified I2C peripheral.
  * By default it is configured in command mode.
  *
- * \note A ModusToolbox™ HAL based equivalent, xensiv_dps3xx_mtb_init_i2c(), is also available
+ * \note A ModusToolbox&trade; HAL based equivalent, mtb_xensiv_dps3xx_init_i2c(), is also available
  *
  * @param[out]  obj         Pointer to an pressure sensor object. The caller must allocate the
  * memory for this object but the init function will initialize its contents.
@@ -273,7 +273,8 @@ cy_rslt_t xensiv_dps3xx_get_revision_id(xensiv_dps3xx_t* obj, uint8_t* revision_
  * @param[out]  temperature Pointer to populate with the temperature data, may be NULL
  * @return CY_RSLT_SUCCESS if the data was obtained, else an error indicating what went wrong.
  */
-cy_rslt_t xensiv_dps3xx_read(xensiv_dps3xx_t* obj, float* pressure, float* temperature);
+cy_rslt_t xensiv_dps3xx_read(xensiv_dps3xx_t* obj, cy_float32_t* pressure,
+                             cy_float32_t* temperature);
 
 /**
  * Gets whether the pressure sensor has new pressure/temperature data ready to be read.
@@ -292,6 +293,50 @@ cy_rslt_t xensiv_dps3xx_check_ready(xensiv_dps3xx_t* obj, bool* pressure_ready,
  * @param[in] obj   Pointer to the pressure sensor object to free.
  */
 void xensiv_dps3xx_free(xensiv_dps3xx_t* obj);
+
+/**
+ * Read from register
+ *
+ * @param[in]   obj                 Pointer to a pressure sensor object
+ * @param[in]   reg_addr            Indicate register address
+ * @param[out]  data                Data to read
+ * @param[in]   length              length of data
+ * @return CY_RSLT_SUCCESS if the check succeeded, else an error indicating what went wrong.
+ */
+cy_rslt_t _xensiv_dps3xx_reg_read(xensiv_dps3xx_t* obj, uint8_t reg_addr, uint8_t* data,
+                                  uint8_t length);
+
+/**
+ * Write to register
+ *
+ * @param[in]   obj                 Pointer to a pressure sensor object
+ * @param[in]   reg_addr            Indicate register address
+ * @param[out]  data                Data to write
+ * @param[in]   length              length of data
+ * @return CY_RSLT_SUCCESS if the check succeeded, else an error indicating what went wrong.
+ */
+cy_rslt_t _xensiv_dps3xx_reg_write(xensiv_dps3xx_t* obj, uint8_t reg_addr, uint8_t* data,
+                                   uint8_t length);
+
+/**
+ * Calculate temperature value from raw temperature data
+ *
+ * @param[in]   obj                 Pointer to a pressure sensor object
+ * @param[in]   temp_raw            Temperature raw data
+ *
+ * @return cy_float32_t 32-bit single-precision floating-point number
+ */
+cy_float32_t _xensiv_dps3xx_calc_temperature(xensiv_dps3xx_t* obj, int32_t temp_raw);
+
+/**
+ * Calculate pressure value from raw pressure data
+ *
+ * @param[in]   obj                 Pointer to a pressure sensor object
+ * @param[in]   press_raw           Pressure raw data
+ *
+ * @return cy_float32_t 32-bit single-precision floating-point number
+ */
+cy_float32_t _xensiv_dps3xx_calc_pressure(xensiv_dps3xx_t* obj, int32_t press_raw);
 
 #if defined(__cplusplus)
 }

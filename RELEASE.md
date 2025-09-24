@@ -1,37 +1,54 @@
-# XENSIV™  DPS-310/368 Pressure Sensor Release Notes
+# XENSIV&trade; DPS-310/368 pressure sensor release notes
 
-This library provides functions for interfacing with the XENSIV™  DPS-310/368 Barometric Pressure Sensors.
+This library provides functions for interfacing with the XENSIV&trade; DPS-310/368 barometric pressure sensors.
 
-### What's Included?
-* APIs for initializing/de-initializing the driver
-* APIs for configuring the sensor
-* APIs for reading pressure and temperature
-* APIs for interfacing with ModusToolbox™ libraries
 
-### What Changed?
+## What's included?
+
+- APIs for initializing/de-initializing the driver
+- APIs for configuring the sensor
+- APIs for reading pressure and temperature
+- APIs for interfacing with ModusToolbox&trade; libraries
+
+See the [README.md](./README.md) and the [API reference guide](https://infineon.github.io/sensor-xensiv-dps3xx/html/index.html) for a complete description of the sensor-xensiv-dps3xx library.
+
+
+## What changed?
+
+#### v2.0.0
+
+- Initial release for PSOC&trade; Edge Kit
+
 #### v1.0.1
-* Fix missing header include for memcpy
+
+- Fixed missing header include for memcpy
+
 #### v1.0.0
-* Initial release
 
-### Supported Software and Tools
-This version of the motion sensor library was validated for compatibility with the following Software and Tools:
+- Initial release
 
-| Software and Tools                        | Version |
-| :---                                      | :----:  |
-| ModusToolbox™ Software Environment        | 2.4.0   |
-| GCC Compiler                              | 10.3.1  |
-| IAR Compiler                              | 9.40.2  |
-| ARM Compiler 6                            | 6.11    |
+## Supported software and tools
 
-Minimum required ModusToolbox™ Software Environment: v2.0
+This version of the sensor-xensiv-dps3xx library is validated for the compatibility with the following software and tools:
 
-### More information
+Software and Tools                                      | Version
+:---                                                    | :----:
+ModusToolbox&trade; software environment                | 3.6.0
+GCC Compiler                                            | 14.2.1
+IAR Compiler                                            | 9.50.2
+Arm&reg; Compiler                                       | 6.22
+LLVM_ARM Compiler                                       | 19.1.5
 
-* [API Reference Guide](https://infineon.github.io/sensor-xensiv-dps3xx/html/index.html)
-* [Infineon Technologies](https://www.infineon.com)
-* [Infineon GitHub](https://github.com/infineon)
-* [ModusToolbox™](https://www.cypress.com/products/modustoolbox-software-environment)
+<br>
+
+## More information
+
+For more information, refer to the following documents:
+
+* [API reference guide](https://infineon.github.io/sensor-xensiv-dps3xx/html/index.html)
+* [ModusToolbox&trade; software environment, quick start guide, documentation, and videos](https://www.infineon.com/modustoolbox)
+* [AN239191](https://www.infineon.com/AN239191) – Getting started with graphics on PSOC&trade; Edge MCU
+* [Infineon Technologies AG](https://www.infineon.com)
 
 ---
-© Infineon Technologies, 2021-2023.
+© 2025, Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation.

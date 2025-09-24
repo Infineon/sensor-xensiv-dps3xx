@@ -1,81 +1,106 @@
-# XENSIV™  DPS-310/368 Pressure Sensor
+# XENSIV&trade; DPS-310/368 pressure sensor
 
 ### Overview
 
-This library provides functions for interfacing with the XENSIV™  DPS-310/368 Barometric Pressure Sensors. These are miniaturized digital barometric air pressure sensors with ultra-high precision (±2 cm) and a low current consumption, capable of measuring both pressure and temperature. The pressure sensor element is based on a capacitive sensing principle which guarantees high precision during temperature changes. This library can be setup to use the ModusToolbox™ HAL interface, or using user provided communication functions.
+This library provides functions for interfacing with the XENSIV&trade; DPS-310/368 barometric pressure sensors. These are miniaturized digital barometric air pressure sensors with ultra-high precision (±2 cm) and a low current consumption, which can measure both pressure and temperature. The pressure sensor element is based on a capacitive sensing principle, which guarantees high precision during temperature changes. This library can be setup to use the ModusToolbox&trade; HAL interface used on the [PSOC&trade; Edge E84 AI Kit](https://www.infineon.com/KIT_PSE84_AI), or using user-provided communication functions.
 
-Sensor Website: https://www.infineon.com/cms/en/product/sensor/pressure-sensors/pressure-sensors-for-iot/
+[Pressure sensors for IoT](https://www.infineon.com/products/sensor/pressure-sensors/pressure-sensors-for-iot)
 
-### Quick Start
-Follow the steps below to create a simple application which outputs the
-pressure and temperature data from the sensor to the UART
-1. Create an empty application
-2. Add this library to the application
-3. Add retarget-io library using the Library Manager
-4. Place following code in the main.c file.
-5. Define I2C SDA and SCL as appropriate for your hardware/shield kit
-```cpp
-#include "cyhal.h"
-#include "cybsp.h"
-#include "cy_retarget_io.h"
-#include "xensiv_dps3xx_mtb.h"
 
-xensiv_dps3xx_t pressure_sensor;
-cyhal_i2c_t i2c;
-cyhal_i2c_cfg_t i2c_cfg = {
-    .is_slave = false,
-    .address = 0,
-    .frequencyhal_hz = 400000
-};
+## Quick start
 
-#define DPS_I2C_SDA (?) // Define me
-#define DPS_I2C_SCL (?) // Define me
+Follow these steps to create a simple application, which outputs the magnetometer data from the sensor to the UART.
 
-int main(void)
-{
-    cy_rslt_t result;
+1. Create a new application in the ModusToolbox&trade; and select the appropriate board support package (BSP)
+2. Select the [PSOC&trade; Edge MCU: Hello world](https://github.com/Infineon/mtb-example-psoc-edge-hello-world) application and create it
+3. Add the sensor-xensiv-dps3xx library to the application
+4. Place the following code in the *main.c* file of the non-secure application of your project (*proj_cm33_ns*)
 
-    /* Initialize the device and board peripherals */
-    result = cybsp_init();
-    CY_ASSERT(result == CY_RSLT_SUCCESS);
+    ```
+    #include "cybsp.h"
+    #include "mtb_hal.h"
+    #include "retarget_io_init.h"
+    #include "mtb_xensiv_dps3xx.h"
 
-    __enable_irq();
+    cy_stc_scb_i2c_context_t i2c_controller_context;
+    mtb_hal_i2c_t CYBSP_I2C_CONTROLLER_hal_obj;
 
-    /* Initialize retarget-io to use the debug UART port */
-    result = cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);
-    CY_ASSERT(result == CY_RSLT_SUCCESS);
+    xensiv_dps3xx_t pressure_sensor;
 
-    /* Initialize i2c for pressure sensor */
-    result = cyhal_i2c_init(&i2c, DPS_I2C_SDA, DPS_I2C_SCL, NULL);
-    CY_ASSERT(result == CY_RSLT_SUCCESS);
-    result = cyhal_i2c_configure(&i2c, &i2c_cfg);
-    CY_ASSERT(result == CY_RSLT_SUCCESS);
-
-    /* Initialize pressure sensor */
-    result = xensiv_dps3xx_mtb_init_i2c(&pressure_sensor, &i2c, XENSIV_DPS3XX_I2C_ADDR_DEFAULT);
-    CY_ASSERT(result == CY_RSLT_SUCCESS);
-
-    for (;;)
+    int main(void)
     {
-        /* Get the pressure and temperature data and print the results to the UART */
-        float pressure, temperature;
-        xensiv_dps3xx_read(&pressure_sensor, &pressure, &temperature);
+        cy_rslt_t result;
 
-        printf("Pressure   : %8f\r\n", pressure);
-        printf("Temperature: %8f\r\n\r\n", temperature);
+        /* Initializes the device and board peripherals. */
+        result = cybsp_init();
 
-        cyhal_system_delay_ms(1000);
+        /* Board initialization failed. Stops program execution. */
+        if (CY_RSLT_SUCCESS != result)
+        {
+            CY_ASSERT(0);
+        }
+
+        /* Enables global interrupts. */
+        __enable_irq();
+
+        /* Initializes retarget-io middleware. */
+        init_retarget_io();
+
+        /* Initializes I2C. */
+        result = Cy_SCB_I2C_Init(CYBSP_I2C_CONTROLLER_HW,
+                                 &CYBSP_I2C_CONTROLLER_config,
+                                 &i2c_controller_context);
+
+        if (CY_RSLT_SUCCESS != result)
+        {
+            CY_ASSERT(0);
+        }
+
+        Cy_SCB_I2C_Enable(CYBSP_I2C_CONTROLLER_HW);
+
+        /* Configures the I2C master interface with the desired clock frequency. */
+        result = mtb_hal_i2c_setup(&CYBSP_I2C_CONTROLLER_hal_obj,
+                                   &CYBSP_I2C_CONTROLLER_hal_config,
+                                   &i2c_controller_context,
+                                   NULL);
+
+        if (CY_RSLT_SUCCESS != result)
+        {
+            CY_ASSERT(0);
+        }
+
+        /* Initializes pressure sensor. */
+        result = mtb_xensiv_dps3xx_init_i2c(&pressure_sensor, &CYBSP_I2C_CONTROLLER_hal_obj,
+                                            XENSIV_DPS3XX_I2C_ADDR_DEFAULT);
+        if (CY_RSLT_SUCCESS != result)
+        {
+            CY_ASSERT(0);
+        }
+
+        for (;;)
+        {
+            /* Gets the pressure and temperature data and print the results to the UART. */
+            float pressure, temperature;
+            xensiv_dps3xx_read(&pressure_sensor, &pressure, &temperature);
+
+            printf("Pressure   : %8f\r\n", (double)pressure);
+            printf("Temperature: %8f\r\n\r\n", (double)temperature);
+
+            Cy_SysLib_Delay(1000);
+        }
     }
-}
-```
-6. Build the application and program the kit.
+    ```
+5. Builds the application and program the kit
 
-### More information
 
-* [API Reference Guide](https://infineon.github.io/sensor-xensiv-dps3xx/html/index.html)
-* [Infineon Technologies](https://www.infineon.com)
-* [Infineon GitHub](https://github.com/infineon)
-* [ModusToolbox™](https://www.cypress.com/products/modustoolbox-software-environment)
+## More information
 
----
-© Infineon Technologies, 2021.
+For more information, see the following documents:
+
+* [API reference guide](https://infineon.github.io/sensor-xensiv-dps3xx/html/index.html)
+* [ModusToolbox&trade; software environment, quick start guide, documentation, and videos](https://www.infineon.com/modustoolbox)
+* [AN235935](https://www.infineon.com/AN235935) – Getting started with PSOC&trade; Edge MCU on ModusToolbox&trade; application note
+* [Infineon Technologies AG](https://www.infineon.com)
+
+-----
+© 2025, Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation.

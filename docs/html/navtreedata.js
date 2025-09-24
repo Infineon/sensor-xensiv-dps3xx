@@ -24,9 +24,12 @@
 */
 var NAVTREE =
 [
-  [ "XENSIV DPS3xx Pressure Sensor (sensor-xensiv-dps3xx)", "index.html", [
-    [ "XENSIV™  DPS-310/368 Pressure Sensor", "index.html", null ],
-    [ "API Reference", "group__group__board__libs.html", null ]
+  [ "Driver library to interface with XENSIV™ DPS-310/368 Barometric Pressure Sensors in ModusToolbox™", "index.html", [
+    [ "XENSIV™ DPS-310/368 pressure sensor", "index.html", [
+      [ "Quick start", "index.html#autotoc_md2", null ],
+      [ "More information", "index.html#autotoc_md3", null ]
+    ] ],
+    [ "API Reference", "modules.html", "modules" ]
   ] ]
 ];
 
