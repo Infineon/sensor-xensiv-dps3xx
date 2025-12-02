@@ -600,7 +600,7 @@ cy_rslt_t xensiv_dps3xx_init_i2c(xensiv_dps3xx_t* obj, const xensiv_dps3xx_i2c_c
         }
         obj->comm.delay(10);
         timeout -= 10;
-    } while (0L >= timeout);
+    } while (timeout > 0L);
 
     // read calibration coefficients
     if (rc == CY_RSLT_SUCCESS)
