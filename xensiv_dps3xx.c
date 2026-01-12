@@ -412,17 +412,22 @@ static cy_rslt_t _xensiv_dps3xx_set_temperature_config(xensiv_dps3xx_t* obj,
 
     if (rc == CY_RSLT_SUCCESS)
     {
-        if (osr_temp > XENSIV_DPS3XX_OVERSAMPLE_8)
+        rc = _xensiv_dps3xx_reg_read(obj, XENSIV_DPS3XX_CFG_REG_ADDR, &reg_val, 1);
+        if (rc == CY_RSLT_SUCCESS)
         {
-            // set T_SHIFT bit in CFG_REG if oversampling rate for temperature is greater than 8x
-            rc = _xensiv_dps3xx_reg_read(obj, XENSIV_DPS3XX_CFG_REG_ADDR, &reg_val, 1);
-            if (rc == CY_RSLT_SUCCESS)
+            if (osr_temp > XENSIV_DPS3XX_OVERSAMPLE_8)
             {
+                // set T_SHIFT bit in CFG_REG if oversampling rate for temperature is greater than 8x
                 reg_val |= XENSIV_DPS3XX_CFG_TMP_SHIFT_EN_SET_VAL;
-                rc = _xensiv_dps3xx_reg_write(obj, XENSIV_DPS3XX_CFG_REG_ADDR, &reg_val, 1);
             }
+            else
+            {
+                // clear T_SHIFT bit in CFG_REG if oversampling rate for temperature is lower or equal to 8x
+                reg_val &= ~XENSIV_DPS3XX_CFG_TMP_SHIFT_EN_SET_VAL;
+            }
+            rc = _xensiv_dps3xx_reg_write(obj, XENSIV_DPS3XX_CFG_REG_ADDR, &reg_val, 1);
         }
-
+        
         if (rc == CY_RSLT_SUCCESS)
         {
             obj->user_config.temperature_rate = mr_temp;
@@ -447,15 +452,20 @@ static cy_rslt_t _xensiv_dps3xx_set_pressure_config(xensiv_dps3xx_t* obj,
 
     if (rc == CY_RSLT_SUCCESS)
     {
-        if (osr_press > XENSIV_DPS3XX_OVERSAMPLE_8)
+        rc = _xensiv_dps3xx_reg_read(obj, XENSIV_DPS3XX_CFG_REG_ADDR, &reg_val, 1);
+        if (rc == CY_RSLT_SUCCESS)
         {
-            // set P_SHIFT bit in CFG_REG if oversampling rate for pressure is greater than 8x
-            rc = _xensiv_dps3xx_reg_read(obj, XENSIV_DPS3XX_CFG_REG_ADDR, &reg_val, 1);
-            if (rc == CY_RSLT_SUCCESS)
+            if (osr_press > XENSIV_DPS3XX_OVERSAMPLE_8)
             {
+                // set P_SHIFT bit in CFG_REG if oversampling rate for pressure is greater than 8x
                 reg_val |= XENSIV_DPS3XX_CFG_PRS_SHIFT_EN_SET_VAL;
-                rc = _xensiv_dps3xx_reg_write(obj, XENSIV_DPS3XX_CFG_REG_ADDR, &reg_val, 1);
             }
+            else
+            {
+                // clear P_SHIFT bit in CFG_REG if oversampling rate for pressure is lower or equal to 8x
+                reg_val &= ~XENSIV_DPS3XX_CFG_PRS_SHIFT_EN_SET_VAL;
+            }
+            rc = _xensiv_dps3xx_reg_write(obj, XENSIV_DPS3XX_CFG_REG_ADDR, &reg_val, 1);
         }
 
         if (rc == CY_RSLT_SUCCESS)
